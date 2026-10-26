@@ -1,0 +1,93 @@
+<mvc:View
+    controllerName="rbx.ecrf.uimodule.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns="sap.m">
+    <Page id="mainPage" showHeader="false" enableScrolling="true">
+        <customHeader>
+            <f:ShellBar
+                id="shellBar"
+                title="{i18n>appTitle}"
+                secondTitle="{i18n>appDescription}"
+                showNotifications="false" />
+        </customHeader>
+        <content>
+            <Table
+                id="formsTable"
+                class="sapUiResponsiveContentPadding"
+                items="{ path: 'forms>/forms', sorter: { path: 'subjectId' } }"
+                growing="true"
+                growingThreshold="20">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>formsTitle}" level="H2" />
+                        <ToolbarSpacer />
+                        <SearchField
+                            width="16rem"
+                            placeholder="{i18n>searchPlaceholder}"
+                            liveChange=".onSearch" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column><Text text="{i18n>colSubject}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>colForm}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>colVisit}" /></Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>colUpdated}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>colStatus}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press=".onItemPress">
+                        <cells>
+                            <ObjectIdentifier title="{forms>subjectId}" text="{forms>site}" />
+                            <Text text="{forms>formName}" />
+                            <Text text="{forms>visit}" />
+                            <Text text="{forms>updatedOn}" />
+                            <ObjectStatus
+                                text="{forms>status}"
+                                state="{ path: 'forms>status', formatter: '.formatStatusState' }" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+
+            <Table
+                id="usersTable"
+                class="sapUiResponsiveContentPadding sapUiMediumMarginTop"
+                items="{ path: 'globalUsers>/data', sorter: { path: 'first_name' } }"
+                noDataText="{i18n>usersNoData}"
+                growing="true"
+                growingThreshold="20">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>usersTitle} ({= ${globalUsers>/count} || 0 })" level="H2" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column><Text text="{i18n>colName}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>colEmail}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>colPhone}" /></Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>colLocation}" /></Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true"><Text text="{i18n>colRole}" /></Column>
+                    <Column hAlign="End"><Text text="{i18n>colStatus}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier
+                                title="{globalUsers>first_name} {globalUsers>last_name}"
+                                text="{globalUsers>username}" />
+                            <Text text="{globalUsers>email}" />
+                            <Text text="{globalUsers>phone}" />
+                            <Text text="{globalUsers>city}, {globalUsers>country}" />
+                            <Text text="{= ${globalUsers>is_admin} ? 'Admin' : 'User' }" />
+                            <ObjectStatus
+                                text="{globalUsers>status}"
+                                icon="{= ${globalUsers>is_locked} ? 'sap-icon://locked' : '' }"
+                                state="{ path: 'globalUsers>status', formatter: '.formatUserStatusState' }" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

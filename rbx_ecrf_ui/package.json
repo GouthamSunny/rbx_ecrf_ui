@@ -1,0 +1,28 @@
+{
+  "name": "rbx_ecrf_ui",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "@sap/cds": "^10",
+    "express": "^5"
+  },
+  "devDependencies": {
+    "@cap-js/cds-types": "^0.20.0",
+    "@cap-js/sqlite": "^3",
+    "fs-extra": "^11.4.1",
+    "minimist": "^1.2.8",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch",
+    "dev": "node dev-server.js"
+  }
+}

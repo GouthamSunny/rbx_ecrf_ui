@@ -1,0 +1,122 @@
+{
+	"destinations": [
+		{
+			"name": "userInfoService",
+			"url": "https://rodev-dev-ro.cfapps.eu10.hana.ondemand.com",
+			"forwardAuthToken": true
+		}
+	],
+	"VCAP_SERVICES": {
+		"destination": [
+			{
+				"label": "destination",
+				"provider": null,
+				"plan": "lite",
+				"name": "roui_destination",
+				"tags": [
+					"destination",
+					"conn",
+					"connsvc"
+				],
+				"instance_guid": "fc89fd3e-630e-4f82-8737-7cec7b3bd186",
+				"instance_name": "roui_destination",
+				"binding_guid": "cf0a8f07-980a-4c40-915a-804a1aa583d1",
+				"binding_name": null,
+				"credentials": {
+					"uaadomain": "authentication.eu10.hana.ondemand.com",
+					"tenantmode": "dedicated",
+					"clientid": "sb-clonefc89fd3e630e4f8287377cec7b3bd186!b47610|destination-xsappname!b404",
+					"instanceid": "fc89fd3e-630e-4f82-8737-7cec7b3bd186",
+					"verificationkey": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsgYJZTjL1FVYrQ1c7XWEoifF+bOWBp7LkWtUqZBp3MEtZi19Hnc0z5uaHQJp2goLeCwxHON28rAe3j0vwZIHEztGV7PA84wCQ+2dVlGewSVwjjUVWe2XsaDiCXsj6+zvbPQ/3TNBe1K8Wfl1htq0WCKhyAcJ97hdjnPpBerMBsVzhR26/D1NN6wT7BYF5kp8Rux2M0sLMQPKG34nBGK9mfXDjjdw1+7j0g3VJFmJljksksvM3x7ybKwulICBneSMtS+pPE04KQ9WpedPUQeoqHlt++v1CEBZKkDORyhbYomJX5HfWuHQ4OxHjHnzMlaw1LCotZTN0giflsl1pmnkSQIDAQAB-----END PUBLIC KEY-----",
+					"xsappname": "clonefc89fd3e630e4f8287377cec7b3bd186!b47610|destination-xsappname!b404",
+					"identityzone": "rodev",
+					"clientsecret": "cf0a8f07-980a-4c40-915a-804a1aa583d1$7lc7E2z85vkv9KH1I2G4PqJ7royPQm1p4HhPWF0Wovg=",
+					"tenantid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+					"uri": "https://destination-configuration.cfapps.eu10.hana.ondemand.com",
+					"url": "https://rodev.authentication.eu10.hana.ondemand.com"
+				},
+				"syslog_drain_url": null,
+				"volume_mounts": []
+			}
+		],
+		"html5-apps-repo": [
+			{
+				"label": "html5-apps-repo",
+				"provider": null,
+				"plan": "app-runtime",
+				"name": "roui-html5-rt",
+				"tags": [
+					"html5appsrepo",
+					"html5-apps-repo-rt",
+					"html5-apps-rt",
+					"html5-apps-repo-dt",
+					"html5-apps-dt"
+				],
+				"instance_guid": "e39b80b7-ad5a-452f-8365-d3041af27a69",
+				"instance_name": "roui-html5-rt",
+				"binding_guid": "9f999937-bf49-4100-bcbd-99a21bd8e616",
+				"binding_name": null,
+				"credentials": {
+					"vendor": "SAP",
+					"uri": "https://html5-apps-repo-rt.cfapps.eu10.hana.ondemand.com",
+					"uaa": {
+						"tenantmode": "dedicated",
+						"sburl": "https://internal-xsuaa.authentication.eu10.hana.ondemand.com",
+						"subaccountid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+						"credential-type": "binding-secret",
+						"clientid": "sb-e39b80b7-ad5a-452f-8365-d3041af27a69!b47610|html5-apps-repo-uaa!b1685",
+						"xsappname": "e39b80b7-ad5a-452f-8365-d3041af27a69!b47610|html5-apps-repo-uaa!b1685",
+						"clientsecret": "9f999937-bf49-4100-bcbd-99a21bd8e616$PpVlc0v49X7-6jlUw8yybiqbXtnUe1bOGoH3ADhdcwU=",
+						"url": "https://rodev.authentication.eu10.hana.ondemand.com",
+						"uaadomain": "authentication.eu10.hana.ondemand.com",
+						"verificationkey": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsgYJZTjL1FVYrQ1c7XWEoifF+bOWBp7LkWtUqZBp3MEtZi19Hnc0z5uaHQJp2goLeCwxHON28rAe3j0vwZIHEztGV7PA84wCQ+2dVlGewSVwjjUVWe2XsaDiCXsj6+zvbPQ/3TNBe1K8Wfl1htq0WCKhyAcJ97hdjnPpBerMBsVzhR26/D1NN6wT7BYF5kp8Rux2M0sLMQPKG34nBGK9mfXDjjdw1+7j0g3VJFmJljksksvM3x7ybKwulICBneSMtS+pPE04KQ9WpedPUQeoqHlt++v1CEBZKkDORyhbYomJX5HfWuHQ4OxHjHnzMlaw1LCotZTN0giflsl1pmnkSQIDAQAB-----END PUBLIC KEY-----",
+						"apiurl": "https://api.authentication.eu10.hana.ondemand.com",
+						"identityzone": "rodev",
+						"identityzoneid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+						"tenantid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+						"zoneid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be"
+					},
+					"grant_type": "client_credentials",
+					"sap.cloud.service": "html5-apps-repo-rt",
+					"saasregistryenabled": true
+				},
+				"syslog_drain_url": null,
+				"volume_mounts": []
+			}
+		],
+		"xsuaa": [
+			{
+				"label": "xsuaa",
+				"provider": null,
+				"plan": "application",
+				"name": "roui-uaa",
+				"tags": [
+					"xsuaa"
+				],
+				"instance_guid": "1a81a9d8-50a5-4d67-a15c-82dd3de9bff6",
+				"instance_name": "roui-uaa",
+				"binding_guid": "cee989a9-9324-42bd-b9c0-c074e6251a1b",
+				"binding_name": null,
+				"credentials": {
+					"tenantmode": "dedicated",
+					"sburl": "https://internal-xsuaa.authentication.eu10.hana.ondemand.com",
+					"subaccountid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+					"credential-type": "instance-secret",
+					"clientid": "sb-dev-ro!t47610",
+					"xsappname": "dev-ro!t47610",
+					"clientsecret": "7/eJjOx4/HTmUmfmoFc/smajhCc=",
+					"url": "https://rodev.authentication.eu10.hana.ondemand.com",
+					"uaadomain": "authentication.eu10.hana.ondemand.com",
+					"verificationkey": "-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsgYJZTjL1FVYrQ1c7XWEoifF+bOWBp7LkWtUqZBp3MEtZi19Hnc0z5uaHQJp2goLeCwxHON28rAe3j0vwZIHEztGV7PA84wCQ+2dVlGewSVwjjUVWe2XsaDiCXsj6+zvbPQ/3TNBe1K8Wfl1htq0WCKhyAcJ97hdjnPpBerMBsVzhR26/D1NN6wT7BYF5kp8Rux2M0sLMQPKG34nBGK9mfXDjjdw1+7j0g3VJFmJljksksvM3x7ybKwulICBneSMtS+pPE04KQ9WpedPUQeoqHlt++v1CEBZKkDORyhbYomJX5HfWuHQ4OxHjHnzMlaw1LCotZTN0giflsl1pmnkSQIDAQAB-----END PUBLIC KEY-----",
+					"apiurl": "https://api.authentication.eu10.hana.ondemand.com",
+					"identityzone": "rodev",
+					"identityzoneid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+					"tenantid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be",
+					"zoneid": "b05bc4e5-e268-48a9-ad8c-d0f4270e93be"
+				},
+				"syslog_drain_url": null,
+				"volume_mounts": []
+			}
+		]
+	}
+}

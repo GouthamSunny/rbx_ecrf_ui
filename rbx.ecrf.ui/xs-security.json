@@ -1,0 +1,59 @@
+{
+    "xsappname": "roui",
+    "tenant-mode": "shared",
+    "scopes": [
+        {
+            "name": "$XSAPPNAME.Callback",
+            "description": "With this scope set, the callbacks for tenant onboarding, offboarding and getDependencies can be called.",
+            "grant-as-authority-to-apps": [
+                "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+            ]
+        },
+        {
+            "name": "$XSAPPNAME.Administrator",
+            "description": "Administrate the application"
+        },
+        {
+            "name": "$XSAPPNAME.User",
+            "description": "Use the application"
+        }
+    ],
+    "role-templates": [
+        {
+            "name": "Administrator",
+            "description": "Administrator",
+            "scope-references": [
+                "$XSAPPNAME.Administrator"
+            ]
+        },
+        {
+            "name": "User",
+            "description": "User",
+            "scope-references": [
+                "$XSAPPNAME.User"
+            ]
+        }
+    ],
+    "role-collections": [
+        {
+            "name": "roui_Administrator",
+            "description": "Release Owl Native CI/CD Solution Administrator",
+            "role-template-references": [
+                "$XSAPPNAME.Administrator",
+                "$XSAPPNAME.User"
+            ]
+        },
+        {
+            "name": "roui_User",
+            "description": "Release Owl Native CI/CD Solution User",
+            "role-template-references": [
+                "$XSAPPNAME.User"
+            ]
+        }
+    ],
+  	"oauth2-configuration": {
+		"redirect-uris": [
+		  	"https://rodev-dev-ro-ui.cfapps.eu10.hana.ondemand.com/login/callback"
+		]
+  	}
+}

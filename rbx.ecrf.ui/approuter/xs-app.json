@@ -1,0 +1,64 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "route",
+  "logout": {
+    "logoutEndpoint": "/do/logout",
+    "logoutPage": "/logout.html"
+  },
+  "routes": [
+    {
+      "source": "^/myinfo/(.*)$",
+      "authenticationType": "xsuaa",
+      "destination": "userInfoService"
+    },
+    {
+      "source": "^/srv/proxy/(.*)$",
+      "authenticationType": "basic",
+      "scope": "$XSAPPNAME.User",
+      "destination": "srv",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/srv/dest/proxy/(.*)$",
+      "authenticationType": "basic",
+      "scope": "$XSAPPNAME.User",
+      "destination": "srv",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/srv/roauth/token",
+      "authenticationType": "basic",
+      "scope": "$XSAPPNAME.User",
+      "destination": "srv",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/srv/(.*)$",
+      "authenticationType": "xsuaa",
+      "scope": "$XSAPPNAME.User",
+      "destination": "srv"
+    },
+    {
+      "source": "^/logout.html$",
+      "localDir": "resources",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/logout-img.png$",
+      "localDir": "resources",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/ReleaseOwlLogo.png",
+      "localDir": "resources",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^(.*)",
+      "target": "/comroroui/$1",
+      "authenticationType": "xsuaa",
+      "service": "html5-apps-repo-rt",
+      "scope": "$XSAPPNAME.User"
+    }
+  ]
+}

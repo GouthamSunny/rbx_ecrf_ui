@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eCRF - No access</title>
+    <!--
+        Shown by the approuter for HTTP 403 (xs-app.json > errorPage), e.g. when the user has no
+        eCRF_User role collection. The Fiori app is not loaded in that case, so this page bootstraps
+        UI5 itself. /resources is reachable without the role (authenticationType "none").
+        Absolute paths: the page is returned for whatever URL produced the 403.
+    -->
+    <script
+        id="sap-ui-bootstrap"
+        src="/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m"
+        data-sap-ui-compat-version="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-on-init="showForbidden">
+    </script>
+    <script>
+        window.showForbidden = function () {
+            sap.ui.require([
+                "sap/m/App",
+                "sap/m/Page",
+                "sap/m/IllustratedMessage",
+                "sap/m/IllustratedMessageType",
+                "sap/m/Button"
+            ], function (App, Page, IllustratedMessage, IllustratedMessageType, Button) {
+                new App({
+                    pages: [new Page({
+                        title: "eCRF",
+                        content: [new IllustratedMessage({
+                            illustrationType: IllustratedMessageType.ErrorScreen,
+                            illustrationSize: "Auto",
+                            title: "You don't have access to eCRF",
+                            description: "Your user is not assigned to the eCRF_User role collection. " +
+                                "Please ask your administrator to assign it, then log out and log in again.",
+                            additionalContent: [
+                                new Button({
+                                    text: "Log Out",
+                                    type: "Emphasized",
+                                    press: function () { window.location.href = "/do/logout"; }
+                                }),
+                                new Button({
+                                    text: "Try Again",
+                                    press: function () { window.location.href = "/"; }
+                                }).addStyleClass("sapUiTinyMarginBegin")
+                            ]
+                        })]
+                    })]
+                }).placeAt("content");
+            });
+        };
+    </script>
+    <style>
+        html, body, #content { height: 100%; margin: 0; }
+        /* Shown if UI5 cannot be loaded */
+        noscript, .fallback { font-family: Arial, Helvetica, sans-serif; display: block; padding: 2rem; text-align: center; }
+    </style>
+</head>
+<body class="sapUiBody">
+    <div id="content"></div>
+    <noscript>You don't have access to eCRF. Please ask your administrator to assign the eCRF_User role collection.</noscript>
+</body>
+</html>

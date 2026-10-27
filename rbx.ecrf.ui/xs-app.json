@@ -1,0 +1,24 @@
+{
+    "welcomeFile": "/index.html",
+    "routes": [
+      {
+        "source": "^/index.html(.*)$",
+        "target": "/comroroui/index.html$1",
+        "service": "html5-apps-repo-rt",
+        "cacheControl": "no-cache, no-store, must-revalidate",
+        "scope": [
+          "$XSAPPNAME.user"
+        ]
+      },
+      {
+        "source": "^(/.*)",
+        "target": "$1",
+        "authenticationType": "xsuaa",
+        "cacheControl": "no-cache, no-store, must-revalidate",
+        "service": "html5-apps-repo-rt"
+      }
+    ]
+  }
+
+
+  

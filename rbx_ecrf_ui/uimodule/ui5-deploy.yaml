@@ -1,0 +1,15 @@
+# Build for Cloud Foundry: `npm run build:cf` -> dist/ + dist/rbxecrfuimodule.zip (deployed to the HTML5 application repository)
+specVersion: "4.0"
+metadata:
+  name: rbx.ecrf.uimodule
+type: application
+resources:
+  configuration:
+    paths:
+      webapp: webapp
+builder:
+  customTasks:
+    - name: ui5-task-zipper
+      afterTask: generateCachebusterInfo
+      configuration:
+        archiveName: rbxecrfuimodule

@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	font-family: 'Lato', sans-serif;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #555;
+	background: #e4e4e4;
+}
+
+.logout {
+	background: #ecf0f3;
+}
+
+.logo {
+	margin: 0px auto;
+	text-align: center;
+}
+
+.fields {
+	width: 100%;
+	padding: 26px 5px 5px 5px;
+}
+
+
+.fields input {
+	border: none;
+	outline: none;
+	background: none;
+	font-size: 13px;
+	color: #555;
+	padding: 10px 10px 10px 5px;
+	width: 100%;
+}
+
+.username, .password {
+	margin-bottom: 30px;
+	border-radius: 25px;
+	box-shadow: inset 8px 8px 8px #cbced1,
+				inset -8px -8px 8px #ffffff;
+}
+
+.username input, .password input {
+	padding-left: 20px;
+}
+
+.logout-button {
+	outline: none;
+	border: none;
+	cursor: pointer;
+	width: 100%;
+	height: 38px;
+	border-radius: 30px;
+	margin-top: 25px;
+	font-size: 14px;
+	font-weight: 700;
+	color: #fff;
+	text-align: center;
+	background: #027fc8;
+	box-shadow: 3px 3px 8px #b1b1b1,
+				-3px -3px 8px #ffffff;
+	transition: .5s;
+}
+
+.logout-button:hover { 
+	background:#006119;
+}
+.logout-button:active { 
+	background:  #006119;
+}
+
+.link {
+	padding-top: 20px;
+	text-align: center;
+}
+
+.link a {
+	text-decoration: none;
+	color: #333333;
+	font-size: 14px;
+}
+
+.link a:hover {
+	color: #027fc8;
+}
+
+.Screen-heading{
+	font-size: 26px;
+	color: #333333;	
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+	.logout {
+		width: 500px;
+		height: 450px;
+		padding: 35px;
+		border-radius: 40px;
+		box-shadow: 0px 0px 10px 0px #cbced1;
+	}
+}
+@media (max-width: 767px) {
+	.logout {
+		width: 100%;
+		padding: 40px 20px;
+	}
+}
+	
+</style>
+</head>
+
+<body>
+	<div class="logout">
+		<div class="logo"> <img src="logout-img.png" width="180" height="92"></div>
+		<!--ro-ui/UI/images/logout-img.png-->
+		<div class="logo"> <img src="ReleaseOwlLogo.png" width="300px" height="auto"></div>
+
+		<p align="center">You have logged out</p>
+		<!-- <p><a href="./">Login again</a></p> -->
+		<button class="logout-button" onclick="logBack();">Click here to log back on</button>
+		      <script>
+         function logBack(){
+             window.location.href = "./";
+             return false;
+         }
+      </script>
+	</div>
+</body>
+</html>

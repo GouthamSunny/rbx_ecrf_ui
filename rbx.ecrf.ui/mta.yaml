@@ -1,0 +1,162 @@
+ID: com.ro.roui
+_schema-version: "3.1"
+version: 1.0.0
+parameters:
+    displayName: 'Release Owl Native CI/CD Solution'
+    description: 'Release Owl'
+    category: 'DevOps'
+    app_name: 'ro-ui'
+    robackend: 'https://na3.releaseowl.com'
+    ext_redirecturl:
+      - 'https://rodev-dev-ro-ui.cfapps.eu10.hana.ondemand.com/login/callback'
+modules:
+  - name: roui-srv
+    type: nodejs
+    path: srv
+    parameters:
+      memory: 128M
+      disk-quota: 256M
+    provides:
+      - name: srv_api
+        properties:
+          url: ${default-url}
+    properties:
+      APP_NAME: ${app_name}
+      SAP_JWT_TRUST_ACL:
+        - clientid: "*"
+          identityzone: "sap-provisioning"
+    requires:
+      - name: roui-uaa
+      - name: roui-registry
+      - name: roui_destination
+      - name: roui_connectivity_service
+      - name: ALS
+      - name: AuditLog
+  - name: ro-ui
+    type: nodejs
+    path: approuter
+    parameters:
+      keep-existing-routes: true
+      memory: 256M
+      disk-quota: 512M
+    provides:
+      - name: app_api
+        properties:
+          url: ${default-url}
+          application: ${app-name}
+    properties:
+      TENANT_HOST_PATTERN: '^(.*)-${space}-${app-name}.${default-domain}'
+    requires:
+      - name: roui-uaa
+      - name: srv_api
+        group: destinations
+        properties:
+          name: srv
+          url: ~{url}
+          forwardAuthToken: true
+          timeout: 3000000
+      - name: html5-rt
+      - name: roui_destination
+      - name: ALS
+      - name: AuditLog
+      - name: roui_connectivity_service
+  - name: webapp_deployer
+    type: com.sap.application.content
+    path: deployer
+    requires:
+      - name: html5-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - artifacts:
+            - dist/uimodule.zip
+          name: uimodule
+          target-path: resources/
+  - name: uimodule
+    type: html5
+    path: uimodule
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - npm run build:uimodule --prefix ..
+      supported-platforms: []
+resources:
+  - name: roui-uaa
+    type: org.cloudfoundry.managed-service
+    requires: 
+      - name: app_api
+    properties:
+      XSAPPNAME: ${xsuaa-app}
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-plan: application
+      xsuaa-app: ${space}-~{app_api/application}
+      config:
+        xsappname: ${xsuaa-app}
+        oauth2-configuration:
+          redirect-uris: ${ext_redirecturl}
+  - name: roui-registry
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: roui-uaa
+    parameters:
+      service: saas-registry
+      service-plan: application
+      service-name: roui-registry
+      config:
+        xsappname:  ~{roui-uaa/XSAPPNAME}
+        displayName: ${displayName}
+        description: ${description}
+        category: ${category}
+        appUrls:
+          onSubscription: https://${org}-${space}-roui-srv.${default-domain}/callback/v1.0/tenants/{tenantId}
+          getDependencies: https://${org}-${space}-roui-srv.${default-domain}/callback/v1.0/dependencies
+  - name: html5-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host  
+  - name: html5-rt
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+      
+    type: org.cloudfoundry.managed-service
+  - name: roui_destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-plan: lite
+      service: destination
+      config:
+        init_data:
+          instance:
+            existing_destinations_policy: update
+            destinations:
+              - Name: backend
+                Description: Backend for ReleaseOwl 
+                URL: ${robackend}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                HTML5.DynamicDestination: true 
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+  - name: roui_connectivity_service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+  - name: ALS
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: application-logs
+      service-plan: lite
+  - name: AuditLog
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: auditlog-management
+      service-plan: default

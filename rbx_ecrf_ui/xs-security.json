@@ -1,0 +1,38 @@
+{
+    "xsappname": "rbx-ecrf",
+    "tenant-mode": "shared",
+    "description": "eCRF - Electronic Case Report Forms",
+    "scopes": [
+        {
+            "name": "$XSAPPNAME.User",
+            "description": "Use the eCRF application"
+        },
+        {
+            "name": "$XSAPPNAME.Callback",
+            "description": "Allows the SaaS registry to call the subscription callbacks (onboarding, offboarding, getDependencies)",
+            "grant-as-authority-to-apps": [
+                "$XSAPPNAME(application,sap-provisioning,tenant-onboarding)"
+            ]
+        }
+    ],
+    "attributes": [],
+    "role-templates": [
+        {
+            "name": "User",
+            "description": "eCRF user",
+            "scope-references": [
+                "$XSAPPNAME.User"
+            ],
+            "attribute-references": []
+        }
+    ],
+    "role-collections": [
+        {
+            "name": "eCRF_User",
+            "description": "eCRF user",
+            "role-template-references": [
+                "$XSAPPNAME.User"
+            ]
+        }
+    ]
+}

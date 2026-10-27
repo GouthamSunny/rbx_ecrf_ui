@@ -158,16 +158,26 @@ sap.ui.define([
             this._sendData("DELETE", sProperty, null, callback, oBusyCtrl);
         },
 
-        _sendData(sMethod, sProperty, oInput, callback, oBusyCtrl) {
+        _sendData(sMethod, sProperty, oInput, callback, oBusyCtrl, bIsRetry) {
             const oBusy = oBusyCtrl || this.getView();
             oBusy.setBusyIndicatorDelay(0);
             oBusy.setBusy(true);
-            this.getApiCall_V2(sProperty).then((prop) => {
+            Promise.all([this.getApiCall_V2(sProperty), this.getCsrfToken()]).then(([prop, sCsrfToken]) => {
                 const oModel = new JSONModel();
+                const oHeaders = this.getRequestHeaders();
+                if (sCsrfToken) {
+                    oHeaders["X-CSRF-Token"] = sCsrfToken;
+                }
                 oModel.attachRequestCompleted((oData) => {
                     oBusy.setBusy(false);
-                    // 2xx with an empty body (e.g. 204 No Content) also counts as success
                     const nStatus = oData.getParameter("errorobject")?.statusCode;
+                    // CSRF token expired (e.g. new session) - fetch a new one and retry once
+                    if (nStatus === 403 && sCsrfToken && !bIsRetry) {
+                        this.resetCsrfToken();
+                        this._sendData(sMethod, sProperty, oInput, callback, oBusyCtrl, true);
+                        return;
+                    }
+                    // 2xx with an empty body (e.g. 204 No Content) also counts as success
                     const bHttpOk = oData.getParameter("success") || (nStatus >= 200 && nStatus < 300);
                     const bSuccess = bHttpOk && oModel.getProperty("/success") !== false;
                     if (!bSuccess) {
@@ -177,11 +187,36 @@ sap.ui.define([
                         callback(oModel, bSuccess);
                     }
                 });
-                oModel.loadData(prop, oInput ? JSON.stringify(oInput) : null, true, sMethod, false, false, this.getRequestHeaders());
+                oModel.loadData(prop, oInput ? JSON.stringify(oInput) : null, true, sMethod, false, false, oHeaders);
             }).catch((error) => {
                 oBusy.setBusy(false);
                 MessageBox.error(String(error));
             });
+        },
+
+        /**
+         * CSRF token for POST/PUT/DELETE. Only needed on Cloud Foundry, where the approuter enforces it
+         * (/appconfig returns roui.csrf = true); the local dev server needs none. Shared by all controllers.
+         */
+        getCsrfToken() {
+            if (!this.getModel().getProperty("/roui/csrf")) {
+                return Promise.resolve(null);
+            }
+            const oComponent = this.getOwnerComponent();
+            if (!oComponent._pCsrfToken) {
+                const sDomain = this.getModel().getProperty("/roui/domain");
+                oComponent._pCsrfToken = fetch(sDomain + "/", {
+                    method: "HEAD",
+                    headers: { "X-CSRF-Token": "Fetch" },
+                    credentials: "same-origin"
+                }).then((oResponse) => oResponse.headers.get("X-CSRF-Token"))
+                    .catch(() => null);
+            }
+            return oComponent._pCsrfToken;
+        },
+
+        resetCsrfToken() {
+            this.getOwnerComponent()._pCsrfToken = null;
         },
 
         /**

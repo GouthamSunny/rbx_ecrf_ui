@@ -1,0 +1,2 @@
+# Build output of the HTML5 content deployer (filled by `mbt build`)
+resources/

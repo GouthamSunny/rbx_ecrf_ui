@@ -1,0 +1,175 @@
+ID: rbx.ecrf
+_schema-version: "3.1"
+version: 1.0.0
+description: eCRF - Electronic Case Report Forms (multitenant)
+
+parameters:
+  enable-parallel-deployments: true
+  displayName: eCRF
+  description: Electronic Case Report Forms
+  category: Clinical
+  # Host name of the approuter: <subdomain>-<app_host>.<domain> (lowercase, no space name: host names arrive lowercase)
+  app_host: rbx-ecrf-ui
+  # Subdomain of the PROVIDER subaccount (BTP cockpit > Subaccount > Overview > Subdomain).
+  # Subscriber URLs are created by replacing this value with the subscriber's subdomain.
+  provider_subdomain: roboxa-d2lmlh1w
+  # Backend server - stored in the "backend" destination of the provider subaccount
+  backend_url: https://111.93.3.163:8082
+  ui5_version: 1.148.13
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --prefix uimodule
+
+modules:
+  # ---------------------------------------------------------------------------
+  # Application router: login (XSUAA), multitenancy, /appconfig and /api proxy
+  # ---------------------------------------------------------------------------
+  - name: rbx-ecrf-ui
+    type: approuter.nodejs
+    path: approuter
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+      keep-existing-routes: true
+      routes:
+        - route: ${provider_subdomain}-${app_host}.${default-domain}
+    properties:
+      TENANT_HOST_PATTERN: '^(.*)-${app_host}.${default-domain}'
+      # Log level for the approuter and server.js (approuter default: error). Use "debug" for more detail.
+      CF_NODEJS_LOGGING_LEVEL: info
+      # Destination with the backend URL and the path used to load the logged-in user
+      BACKEND_DESTINATION: backend
+      USER_API_PATH: /users/get_by_email/{email}
+      # The backend is shared by all tenants: read the destination from the provider subaccount.
+      # Set to "false" if each subscriber maintains its own "backend" destination.
+      BACKEND_DESTINATION_PROVIDER_ONLY: "true"
+    requires:
+      - name: rbx-ecrf-uaa
+      - name: rbx-ecrf-registry
+      - name: rbx-ecrf-destination
+      - name: rbx-ecrf-connectivity
+      - name: rbx-ecrf-html5-rt
+      - name: rbx-ecrf-logs
+    provides:
+      - name: approuter_api
+        properties:
+          url: ${default-url}
+
+  # ---------------------------------------------------------------------------
+  # Fiori app (uimodule) -> HTML5 application repository
+  # ---------------------------------------------------------------------------
+  - name: rbx-ecrf-uimodule
+    type: html5
+    path: uimodule
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm run build:cf
+      supported-platforms: []
+
+  - name: rbx-ecrf-ui-deployer
+    type: com.sap.application.content
+    path: deployer
+    requires:
+      - name: rbx-ecrf-html5-host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources
+      requires:
+        - name: rbx-ecrf-uimodule
+          artifacts:
+            - rbxecrfuimodule.zip
+          target-path: resources/
+
+resources:
+  - name: rbx-ecrf-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: rbx-ecrf-${space}
+        tenant-mode: shared
+        oauth2-configuration:
+          redirect-uris:
+            - https://*-${app_host}.${default-domain}/**
+
+  - name: rbx-ecrf-registry
+    type: org.cloudfoundry.managed-service
+    requires:
+      - name: rbx-ecrf-uaa
+    parameters:
+      service: saas-registry
+      service-plan: application
+      config:
+        xsappname: rbx-ecrf-${space}
+        appName: rbx-ecrf-${space}
+        displayName: ${displayName}
+        description: ${description}
+        category: ${category}
+        appUrls:
+          # Handled by the approuter itself (it is bound to this saas-registry instance)
+          getDependencies: https://${provider_subdomain}-${app_host}.${default-domain}/callback/v1.0/dependencies
+          onSubscription: https://${provider_subdomain}-${app_host}.${default-domain}/callback/v1.0/tenants/{tenantId}
+          onSubscriptionAsync: false
+          onUnSubscriptionAsync: false
+          callbackTimeoutMillis: 300000
+
+  - name: rbx-ecrf-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+        init_data:
+          subaccount:
+            existing_destinations_policy: update
+            destinations:
+              - Name: backend
+                Description: eCRF backend
+                URL: ${backend_url}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+                # The current backend uses a self-signed certificate. Remove once it has a trusted one.
+                TrustAll: "true"
+              - Name: ui5
+                Description: SAPUI5 runtime (CDN)
+                URL: https://sapui5.hana.ondemand.com/${ui5_version}
+                Type: HTTP
+                ProxyType: Internet
+                Authentication: NoAuthentication
+
+  - name: rbx-ecrf-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+
+  - name: rbx-ecrf-html5-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+
+  - name: rbx-ecrf-html5-rt
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime
+
+  # Application Logging: keeps the approuter / server.js logs and makes them searchable
+  # (BTP cockpit > space Dev > Applications > rbx-ecrf-ui > Logs > Open Kibana Dashboard)
+  - name: rbx-ecrf-logs
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: application-logs
+      service-plan: lite

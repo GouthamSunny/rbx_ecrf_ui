@@ -1,0 +1,13 @@
+{
+    "name": "rbx-ecrf-uimodule",
+    "version": "1.0.0",
+    "description": "eCRF Fiori app",
+    "private": true,
+    "scripts": {
+        "build:cf": "ui5 build preload --config ui5-deploy.yaml --clean-dest --include-task=generateCachebusterInfo"
+    },
+    "devDependencies": {
+        "@ui5/cli": "^4.0.71",
+        "ui5-task-zipper": "^3.7.0"
+    }
+}

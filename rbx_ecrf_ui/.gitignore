@@ -17,3 +17,7 @@ mta_archives/
 
 # @cap-js/cds-typer
 @cds-models
+
+../rbx.ecrf.ui
+# Fiori app build output
+uimodule/dist/

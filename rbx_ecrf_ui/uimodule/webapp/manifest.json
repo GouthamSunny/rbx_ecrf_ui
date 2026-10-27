@@ -3,7 +3,13 @@
     "sap.app": {
         "id": "rbx.ecrf.uimodule",
         "type": "application",
-        "i18n": "i18n/i18n.properties",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "supportedLocales": [
+                ""
+            ],
+            "fallbackLocale": ""
+        },
         "applicationVersion": {
             "version": "1.0.0"
         },
@@ -51,7 +57,11 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "rbx.ecrf.uimodule.i18n.i18n"
+                    "bundleName": "rbx.ecrf.uimodule.i18n.i18n",
+                    "supportedLocales": [
+                        ""
+                    ],
+                    "fallbackLocale": ""
                 }
             },
             "": {

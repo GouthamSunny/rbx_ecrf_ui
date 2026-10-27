@@ -1,0 +1,35 @@
+{
+	"name": "approuter",
+	"description": "Node.js based application router service for html5-apps",
+	"scripts": {
+		"start": "node extended-server.js",
+		"startOrig": "node node_modules/@sap/approuter/approuter.js"
+	},
+	"engines": {
+		"node": "^20.0.0",
+    "npm": "^9.0.0"
+	},
+	"dependencies": {
+		"@sap/approuter": "^14.1.2",
+		"@sap/xsenv": "^3.4.0",
+		"@sap/xssec": "^3.2.17",
+		"body-parser": "^1.20.2",
+    "cf-nodejs-logging-support": "^7.4.0",
+		"cfenv": "^1.2.4",
+		"cookie-parser": "^1.4.6",
+    "crypto": "^1.0.1",
+		"debug": "^4.3.4",
+		"express": "^4.18.2",
+    "express-http-proxy": "^1.6.3",
+		"http-errors": "^2.0.0",
+		"jade": "^1.11.0",
+		"jwt-decode": "^3.1.2",
+		"morgan": "^1.10.0",
+		"node-fetch": "^3.3.1",
+		"passport": "^0.6.0",
+		"pg": "^8.11.1",
+		"request": "^2.88.2",
+		"request-promise": "^4.2.6",
+		"url": "^0.11.1"
+	}
+}

@@ -2,11 +2,14 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/UIComponent",
     "sap/ui/model/json/JSONModel",
-    "sap/m/MessageBox"
-], (Controller, UIComponent, JSONModel, MessageBox) => {
+    "sap/m/MessageBox",
+    "../model/formatter"
+], (Controller, UIComponent, JSONModel, MessageBox, formatter) => {
     "use strict";
 
     return Controller.extend("rbx.ecrf.uimodule.controller.BaseController", {
+
+        formatter: formatter,
 
         getModel(sName) {
             return this.getView().getModel(sName) || this.getOwnerComponent().getModel(sName);
@@ -138,6 +141,50 @@ sap.ui.define([
         },
 
         /**
+         * POST a JSON payload to an API.
+         *   this.loadData_POST("addProjectAPI", { name: "..." }, (oModel, bSuccess) => { ... });
+         * callback gets the response model and a success flag; errors are shown in a MessageBox.
+         * oBusyCtrl (optional) is set busy during the call instead of the whole view.
+         */
+        loadData_POST(sProperty, oInput, callback, oBusyCtrl) {
+            this._sendData("POST", sProperty, oInput, callback, oBusyCtrl);
+        },
+
+        /**
+         * DELETE via an API. Use replaceVars for the key in the URL:
+         *   this.loadData_DELETE({ propertyName: "deleteProjectAPI", replaceVars: { id } }, (oModel, bSuccess) => { ... });
+         */
+        loadData_DELETE(sProperty, callback, oBusyCtrl) {
+            this._sendData("DELETE", sProperty, null, callback, oBusyCtrl);
+        },
+
+        _sendData(sMethod, sProperty, oInput, callback, oBusyCtrl) {
+            const oBusy = oBusyCtrl || this.getView();
+            oBusy.setBusyIndicatorDelay(0);
+            oBusy.setBusy(true);
+            this.getApiCall_V2(sProperty).then((prop) => {
+                const oModel = new JSONModel();
+                oModel.attachRequestCompleted((oData) => {
+                    oBusy.setBusy(false);
+                    // 2xx with an empty body (e.g. 204 No Content) also counts as success
+                    const nStatus = oData.getParameter("errorobject")?.statusCode;
+                    const bHttpOk = oData.getParameter("success") || (nStatus >= 200 && nStatus < 300);
+                    const bSuccess = bHttpOk && oModel.getProperty("/success") !== false;
+                    if (!bSuccess) {
+                        this.messageBoxError(oData, oModel);
+                    }
+                    if (callback) {
+                        callback(oModel, bSuccess);
+                    }
+                });
+                oModel.loadData(prop, oInput ? JSON.stringify(oInput) : null, true, sMethod, false, false, this.getRequestHeaders());
+            }).catch((error) => {
+                oBusy.setBusy(false);
+                MessageBox.error(String(error));
+            });
+        },
+
+        /**
          * Sets data on the named model of oCtrl (view or component), creating the model if needed.
          */
         setModelDataToCtrl(data, sModelName, oCtrl, nSizeLimit) {
@@ -153,10 +200,11 @@ sap.ui.define([
             return oModel;
         },
 
-        messageBoxError(oData) {
+        messageBoxError(oData, oModel) {
             const oParams = oData?.getParameters?.() || {};
             const oError = oParams.errorobject || {};
-            let sMessage = oError.responseText || oError.statusText || "Request failed";
+            // HTTP 200 with { success: false, message } - take the message from the response body
+            let sMessage = oModel?.getProperty("/message") || oError.responseText || oError.statusText || "Request failed";
             try {
                 const oJson = JSON.parse(sMessage);
                 sMessage = oJson.message || oJson.error?.message || oJson.error || sMessage;

@@ -1,0 +1,45 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m">
+    <Dialog
+        id="addProjectDialog"
+        title="{i18n>addProjectTitle}"
+        contentWidth="32rem"
+        afterClose=".onAddProjectAfterClose">
+        <form:SimpleForm
+            editable="true"
+            layout="ResponsiveGridLayout"
+            labelSpanM="3"
+            labelSpanL="3"
+            singleContainerFullSize="false">
+            <Label text="{i18n>colName}" labelFor="newProjectName" required="true" />
+            <Input
+                id="newProjectName"
+                value="{ path: 'newProject>/name' }"
+                valueLiveUpdate="true"
+                maxLength="100"
+                placeholder="{i18n>projectNamePlaceholder}"
+                submit=".onAddProjectSave" />
+            <Label text="{i18n>colDescription}" labelFor="newProjectDescription" />
+            <TextArea
+                id="newProjectDescription"
+                value="{newProject>/description}"
+                rows="4"
+                growing="true"
+                maxLength="500"
+                width="100%"
+                placeholder="{i18n>projectDescriptionPlaceholder}" />
+        </form:SimpleForm>
+        <beginButton>
+            <Button
+                type="Emphasized"
+                text="{i18n>create}"
+                enabled="{ path: 'newProject>/name', formatter: '.formatter.isNotBlank' }"
+                press=".onAddProjectSave" />
+        </beginButton>
+        <endButton>
+            <Button text="{i18n>cancel}" press=".onAddProjectCancel" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

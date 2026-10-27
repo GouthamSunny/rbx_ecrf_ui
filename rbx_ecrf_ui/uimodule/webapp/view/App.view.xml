@@ -1,7 +1,31 @@
 <mvc:View
     controllerName="rbx.ecrf.uimodule.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
     xmlns="sap.m"
-    displayBlock="true">
-    <App id="app" />
+    displayBlock="true"
+    height="100%">
+    <App id="rootApp">
+        <Page id="shellPage" enableScrolling="false">
+            <customHeader>
+                <f:ShellBar
+                    id="shellBar"
+                    title="{i18n>appTitle}"
+                    secondTitle="{i18n>appDescription}"
+                    avatarPressed=".onAvatarPressed"
+                    >
+                    <f:profile>
+                        <Avatar
+                            id="userAvatar"
+                            initials="{ parts: ['userDetails>/first_name', 'userDetails>/last_name'], formatter: '.formatter.initials' }"
+                            tooltip="{userDetails>/first_name} {userDetails>/last_name}" />
+                    </f:profile>
+                </f:ShellBar>
+            </customHeader>
+            <content>
+                <!-- Router places the pages (Projects, ...) here -->
+                <NavContainer id="app" height="100%" />
+            </content>
+        </Page>
+    </App>
 </mvc:View>

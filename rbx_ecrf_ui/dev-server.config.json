@@ -1,8 +1,10 @@
 {
     "port": "8080",
-    "userId": "gouthamsunny21@gmail.com",
+    "userId": "vasanthi@gmail.com",
     "webRoot": "./uimodule/webapp",
-    "backendUrl": "http://192.168.0.22:8082/",
+    "backendUrl": "https://111.93.3.163:8082/",
+    "strictSSL": false,
+    "userApiPath": "/users/get_by_email/{email}",
     "authKey": "",
     "ui5": {
         "localPath": "./sapui5",

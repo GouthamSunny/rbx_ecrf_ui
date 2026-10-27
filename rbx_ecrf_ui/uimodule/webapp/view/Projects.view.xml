@@ -1,0 +1,51 @@
+<mvc:View
+    controllerName="rbx.ecrf.uimodule.controller.Projects"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="projectsPage" showHeader="false">
+        <content>
+            <Table
+                id="projectsTable"
+                class="sapUiResponsiveContentPadding"
+                mode="Delete"
+                delete=".onDeleteProject"
+                items="{ path: 'projects>/data', sorter: { path: 'name' } }"
+                noDataText="{i18n>projectsNoData}"
+                growing="true"
+                growingThreshold="20">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <Title text="{i18n>projectsTitle} ({= ${projects>/count} || 0 })" level="H2" />
+                        <ToolbarSpacer />
+                        <SearchField
+                            width="16rem"
+                            placeholder="{i18n>searchProjects}"
+                            liveChange=".onSearch" />
+                        <Button
+                            id="addProjectButton"
+                            text="{i18n>addProject}"
+                            icon="sap-icon://add"
+                            type="Emphasized"
+                            press=".onAddProject" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column width="20%"><Text text="{i18n>colName}" /></Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true"><Text text="{i18n>colDescription}" /></Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true" width="12rem"><Text text="{i18n>colCreated}" /></Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true" width="12rem"><Text text="{i18n>colUpdated}" /></Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier title="{projects>name}" />
+                            <Text text="{projects>description}" />
+                            <Text text="{ path: 'projects>created_at', formatter: '.formatter.dateTime' }" />
+                            <Text text="{ path: 'projects>updated_at', formatter: '.formatter.dateTime' }" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>

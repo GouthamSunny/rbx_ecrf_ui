@@ -34,8 +34,12 @@
 
     totalres.roui.domain = config.localserver || API_PREFIX ;
     totalres.roui.origin = config.sorigin || `http://localhost:${config.port}`;
-    totalres.roui.email = config.userId || "gouthamsunny21@gmail.com" ;
+    totalres.roui.email = config.userId ;
     totalres.roui.key = config.authKey || "";
+    totalres.user = {};
+
+    // Path used at startup to load the logged-in user; {email} is replaced with config.userId
+    config.userApiPath = argv.userApiPath || config.userApiPath || "/users/{email}";
 
 
     app.set("port", config.port);
@@ -56,7 +60,8 @@
       delete headers.host;
       delete headers.origin;
       delete headers.referer;
-      req.pipe(request({ url: target, method: req.method, headers: headers }))
+      // strictSSL: false in the config accepts self-signed / untrusted backend certificates
+      req.pipe(request({ url: target, method: req.method, headers: headers, strictSSL: config.strictSSL !== false }))
         .on("error", function (err) {
           console.error(`API proxy error: ${req.method} ${target} -> ${err.message}`);
           if (!res.headersSent) res.status(502);
@@ -80,7 +85,21 @@
       }
       app.use(mount, function (req, res) {
         const target = new url.URL(mount.slice(1) + req.url, ui5CdnBase).href;
-        request({ url: target, gzip: true })
+        // Pass the response through as-is (still compressed); decompressing here would leave a wrong
+        // Content-Length header and the browser would cut files short.
+        const headers = {};
+        ["accept-encoding", "if-none-match", "if-modified-since"].forEach(function (name) {
+          if (req.headers[name]) {
+            headers[name] = req.headers[name];
+          }
+        });
+        request({ url: target, headers: headers })
+          .on("response", function (cdnRes) {
+            // The CDN allows caching for ~10 years; in development make the browser revalidate
+            // (cheap 304 via ETag) so a bad copy can never get stuck in the browser cache.
+            cdnRes.headers["cache-control"] = "no-cache";
+            delete cdnRes.headers["expires"];
+          })
           .on("error", function (err) {
             console.error(`UI5 proxy error: ${target} -> ${err.message}`);
             if (!res.headersSent) res.status(502);
@@ -109,24 +128,72 @@
     }
 
 
-    const server = app.listen(app.get("port"), function () {
-      const appUrl = `http://localhost:${app.get("port")}/index.html`;
-      console.log("");
-      console.log(`  Fiori app running at  ${appUrl}`);
-      console.log(`  Web root              ${config.webRoot}`);
-      console.log(`  UI5 resources         ${hasLocalUi5 ? ui5LocalPath : ui5CdnBase}`);
-      console.log("");
-      if (argv.open !== false) openBrowser(appUrl);
-    });
-
-    server.on("error", function (err) {
-      if (err.code === "EADDRINUSE") {
-        console.error(`Port ${config.port} is already in use. Try: node dev-server.js --port 9000`);
-      } else {
-        console.error(err);
+    // Load the logged-in user (config.userId) from the backend. The server only starts if this succeeds.
+    function loadUser() {
+      if (!config.userId) {
+        return Promise.reject(new Error("userId (email) is not set in dev-server.config.json"));
       }
-      process.exit(1);
-    });
+      if (!config.backendUrl) {
+        return Promise.reject(new Error("backendUrl is not set in dev-server.config.json"));
+      }
+      const userUrl = config.backendUrl.replace(/\/+$/, "") +
+        config.userApiPath.replace("{email}", encodeURIComponent(config.userId));
+      const headers = { "xu": config.userId };
+      if (config.authKey) {
+        headers["Authorization"] = config.authKey;
+      }
+      console.log(`  Loading user          ${userUrl}`);
+      return rp({ uri: userUrl, headers: headers, json: true, strictSSL: config.strictSSL !== false, timeout: 20000 })
+        .then(function (body) {
+          if (!body || body.success !== true || !body.data) {
+            throw new Error(`Unexpected response: ${JSON.stringify(body).slice(0, 300)}`);
+          }
+          totalres.user = body.data;
+          return body.data;
+        })
+        .catch(function (err) {
+          if (err.statusCode) {
+            const body = typeof err.error === "object" ? JSON.stringify(err.error) : String(err.error || "");
+            throw new Error(`HTTP ${err.statusCode} from ${userUrl} ${body.slice(0, 300)}`);
+          }
+          throw err.cause || err;
+        });
+    }
+
+
+    function startServer() {
+      const server = app.listen(app.get("port"), function () {
+        const appUrl = `http://localhost:${app.get("port")}/index.html`;
+        console.log("");
+        console.log(`  Fiori app running at  ${appUrl}`);
+        console.log(`  Web root              ${config.webRoot}`);
+        console.log(`  UI5 resources         ${hasLocalUi5 ? ui5LocalPath : ui5CdnBase}`);
+        console.log("");
+        if (argv.open !== false) openBrowser(appUrl);
+      });
+
+      server.on("error", function (err) {
+        if (err.code === "EADDRINUSE") {
+          console.error(`Port ${config.port} is already in use. Try: node dev-server.js --port 9000`);
+        } else {
+          console.error(err);
+        }
+        process.exit(1);
+      });
+    }
+
+
+    console.log("");
+    loadUser()
+      .then(function (user) {
+        console.log(`  Logged in as          ${[user.first_name, user.last_name].filter(Boolean).join(" ")} <${user.email || config.userId}>`);
+        startServer();
+      })
+      .catch(function (err) {
+        console.error(`\n  Could not load user "${config.userId}" - dev server not started.`);
+        console.error(`  ${err.message || err}\n`);
+        process.exit(1);
+      });
 
   }
 )();

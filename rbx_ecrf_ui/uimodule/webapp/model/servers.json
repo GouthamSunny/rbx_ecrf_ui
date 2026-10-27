@@ -1,3 +1,6 @@
 {
+    "projectsAPI": "{server_name}/projects/list",
+    "addProjectAPI": "{server_name}/projects/add",
+    "deleteProjectAPI": "{server_name}/projects/delete/{id}",
     "usersAPI": "{server_name}/users/list"
 }

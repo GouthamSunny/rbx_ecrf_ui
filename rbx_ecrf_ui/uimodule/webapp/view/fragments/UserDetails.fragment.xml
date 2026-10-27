@@ -1,0 +1,45 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m">
+    <Popover
+        id="userDetailsPopover"
+        title="{i18n>userDetails}"
+        placement="Bottom"
+        contentWidth="22rem">
+        <VBox class="sapUiSmallMargin" alignItems="Center">
+            <Avatar
+                initials="{ parts: ['userDetails>/first_name', 'userDetails>/last_name'], formatter: '.formatter.initials' }"
+                displaySize="L" />
+            <Title
+                class="sapUiTinyMarginTop"
+                text="{userDetails>/first_name} {userDetails>/last_name}"
+                level="H3" />
+            <Text text="{userDetails>/email}" />
+        </VBox>
+        <form:SimpleForm
+            editable="false"
+            layout="ResponsiveGridLayout"
+            labelSpanM="4"
+            labelSpanL="4"
+            singleContainerFullSize="false">
+            <Label text="{i18n>userUsername}" />
+            <Text text="{userDetails>/username}" />
+            <Label text="{i18n>userPhone}" />
+            <Text text="{userDetails>/phone}" />
+            <Label text="{i18n>userAddress}" />
+            <Text text="{ parts: ['userDetails>/address', 'userDetails>/city', 'userDetails>/state', 'userDetails>/postal_code', 'userDetails>/country'], formatter: '.formatter.address' }" />
+            <Label text="{i18n>userTimezone}" />
+            <Text text="{userDetails>/timezone}" />
+            <Label text="{i18n>userRole}" />
+            <Text text="{= ${userDetails>/is_admin} ? ${i18n>roleAdmin} : ${i18n>roleUser} }" />
+            <Label text="{i18n>userStatus}" />
+            <ObjectStatus
+                text="{userDetails>/status}"
+                icon="{= ${userDetails>/is_locked} ? 'sap-icon://locked' : '' }"
+                state="{= ${userDetails>/status} === 'active' ? 'Success' : 'Warning' }" />
+            <Label text="{i18n>userLastLogin}" />
+            <Text text="{ path: 'userDetails>/last_login_at', formatter: '.formatLastLogin' }" />
+        </form:SimpleForm>
+    </Popover>
+</core:FragmentDefinition>
